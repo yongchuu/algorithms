@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
   
-public class SQUARE2 {
+public class ROOTED_TREE {
     static int N;
     static int[][] arr;
     static int[][] flag;

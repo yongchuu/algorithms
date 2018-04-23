@@ -1,5 +1,8 @@
 package algorithms;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 public class NQUEEN {
     static int count = 0;
     public static boolean isPromising(int[] q, int n) {
@@ -28,12 +31,11 @@ public class NQUEEN {
         }
     }
 
-    public static void main(String[] args) {
-        for (short n = 1; n < 14; n++) {
-            enumerate(n);
+    public static void main(String[] args) throws Exception {
+    	BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    	int n = Integer.parseInt(br.readLine());
+        enumerate(n);
             
-            System.out.println("n = " + (n < 10 ? "0" : "") + n + ", solution count is " + count + ".");
-            count = 0;
-        }
+        System.out.println(count);
     }
 }
