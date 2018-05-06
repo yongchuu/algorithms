@@ -2,84 +2,87 @@ package algorithms;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Queue;
+import java.util.Comparator;
 import java.util.StringTokenizer;
-
+ 
 public class SDS_PRO_4_5 {
-	static int N, X;
-	
-	static class el {
-		int b, t;
-		el(int b, int t){
-			this.b = b;
-			this.t = t;
-		}
-	}
-	
-	static int dijkstra(int idx, ArrayList<ArrayList<el>> list){
-		Queue<el> q = new ArrayDeque<el>();
-		
-		q.add(new el(idx, 0));
-		int flag[] = new int[N+1];
-		
-		for(int i = 0; i <= N; i++){
-			flag[i] = Integer.MAX_VALUE;
-		}
-		flag[idx] = 0;
-		
-		while(!q.isEmpty()){
-			el tmp = q.poll();
-			int b = tmp.b;
-			int t = tmp.t;
-			
-			for(int i = 0; i < list.get(b).size(); i++){
-				if(flag[list.get(b).get(i).b] > flag[b] + list.get(b).get(i).t){
-					flag[list.get(b).get(i).b] = flag[b] + list.get(b).get(i).t;
-					q.add(new el(list.get(b).get(i).b, flag[b] + list.get(b).get(i).t));
-				}
-			}
-		}
-		
-		return flag[X];
-	}
-	
-	public static void main(String[] args) throws Exception{
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		
-		N = Integer.parseInt(st.nextToken());
-		int M = Integer.parseInt(st.nextToken());
-		X = Integer.parseInt(st.nextToken());
-		
-		ArrayList<ArrayList<el>> node = new ArrayList<ArrayList<el>>();
-		ArrayList<ArrayList<el>> reverse = new ArrayList<ArrayList<el>>();
-		
-		for(int i = 0; i <= N; i++){
-			node.add(new ArrayList<el>());
-			reverse.add(new ArrayList<el>());
-		}
-		
-		for(int i = 0; i < M; i++){
-			st = new StringTokenizer(br.readLine());
-			int a = Integer.parseInt(st.nextToken()); 
-			int b = Integer.parseInt(st.nextToken()); 
-			int t = Integer.parseInt(st.nextToken());
-			
-			node.get(a).add(new el(b, t));
-			reverse.get(b).add(new el(a, t));
-		}
-		
-		int max = 0;
-		for(int i = 1; i <= N; i++){
-			int tn = dijkstra(i, node);
-			int tr = dijkstra(i, reverse);
-			if(max < tn + tr)
-				max = tn + tr;
-		}
-		
-		System.out.println(max);
-	}
+    static class el{
+        int s, e, t;
+        el(int s, int e, int t){
+            this.s = s;
+            this.e = e;
+            this.t = t;
+        }
+         
+        @Override
+        public String toString(){
+            return s + " " + e + " " + t;
+        }
+    }
+     
+    static int[] union;
+    static int find(int idx){
+        if(union[idx] == idx) return idx;
+        return union[idx] = find(union[idx]);
+    }
+     
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+         
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
+        int K = Integer.parseInt(st.nextToken());
+         
+        union = new int[N+1];
+        for(int i = 0; i <= N; i++)
+            union[i] = i;
+         
+        ArrayList<el> list = new ArrayList<el>();
+         
+        long ans = 0;
+         
+        for(int i = 0; i < M; i++){
+            st = new StringTokenizer(br.readLine());
+            int s = Integer.parseInt(st.nextToken());
+            int e = Integer.parseInt(st.nextToken());
+            int t = Integer.parseInt(st.nextToken());
+            ans += t;
+            list.add(new el(s,e,t * -1));
+        }
+        for(int i = 0; i < K; i++){
+            st = new StringTokenizer(br.readLine());
+            int s = Integer.parseInt(st.nextToken());
+            int e = Integer.parseInt(st.nextToken());
+            int t = Integer.parseInt(st.nextToken());
+            list.add(new el(s,e,t));
+        }
+         
+        list.sort(new Comparator<el>() {
+            @Override
+            public int compare(el o1, el o2) {
+                return o1.t - o2.t;
+            }
+        });
+        int cnt = 0;
+         
+        for(int i = 0; i < M+K; i++){
+            el getI = list.get(i);
+            if(i == 0 || getI.t != list.get(i-1).t){
+                for(int j = i; j < M+K && list.get(j).t == getI.t;j++){
+                    el getJ = list.get(j);
+                    if(find(getJ.s) != find(getJ.e)) cnt++;
+                }
+            }
+            if(find(getI.s) == find(getI.e)){
+                continue;
+            }
+            union[find(getI.s)] = find(getI.e);
+            ans += getI.t;
+        }
+         
+        System.out.print(ans + " ");
+        System.out.println(cnt <= N-1 ? "unique" : "not unique");
+    }
 }
